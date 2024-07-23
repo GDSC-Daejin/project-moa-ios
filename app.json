@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "moas",
+    "slug": "moas",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.donny1234.moa"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "newArchEnable": true
+          }
+        }
+      ],
+      [
+        "@react-native-kakao/core",
+        {
+          "nativeAppKey": "a3cc1edbf773c9ba5555e6036fc68373",
+          "android": {},
+          "ios": {
+            "handleKakaoOpenUrl": true
+          }
+        }
+      ]
+    ]
+  }
+}
