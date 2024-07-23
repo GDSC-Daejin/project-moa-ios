@@ -8,7 +8,7 @@ import { initializeKakaoSDK } from "@react-native-kakao/core";
 import { KAKAO_API_KEY } from "@env";
 import { UserData } from "../type/type";
 
-export default function UserLogo() {
+export default function UserLogo({ isLoggedIn }: any) {
   const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
@@ -25,16 +25,16 @@ export default function UserLogo() {
   return (
     <View style={styles.profileContainer}>
       <View style={styles.profile}>
-        {userData ? (
+        {isLoggedIn ? (
           <Image
-            source={{ uri: userData.thumbnailImageUrl }}
+            source={{ uri: userData?.thumbnailImageUrl }}
             style={styles.profileImage}
           />
         ) : (
           <MyPageDummyImg />
         )}
         <MyPageEditLogo />
-        {userData ? (
+        {isLoggedIn ? (
           <Text style={styles.profileText}>{userData?.nickname}</Text>
         ) : (
           <Text style={styles.profileText}>로그인해주세요!</Text>

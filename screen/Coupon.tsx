@@ -4,11 +4,15 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors, Size } from "../style/style";
 import { FlatList } from "react-native-gesture-handler";
 import SelectCategory from "../components/SelectCategory";
+import { app } from "../firebaseConfig";
 
 export default function Coupon() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [data, setData] = useState([]);
   const [showBox, setShowBox] = useState(false);
+
+  const a = app;
+  console.log(a);
 
   const topData = [
     { id: "top_all", label: "전체" },

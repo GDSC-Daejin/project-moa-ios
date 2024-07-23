@@ -3,12 +3,15 @@ import { Colors, Size } from "../style/style";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
 import { LoginIntroParam } from "../type/type";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { initializeKakaoSDK } from "@react-native-kakao/core";
 import { KAKAO_API_KEY } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isLogined } from "@react-native-kakao/user";
 
 export default function HomeButton() {
+  const [isUser, setIsUser] = useState(false);
+
   useEffect(() => {
     initializeKakaoSDK(KAKAO_API_KEY);
   }, []);
@@ -17,8 +20,9 @@ export default function HomeButton() {
     useNavigation<NativeStackNavigationProp<LoginIntroParam>>();
 
   const handleMove = async () => {
-    const checkLogin = await isLogined();
-    if (checkLogin) {
+    const isUser = await isLogined();
+
+    if (isUser) {
       return navigation.navigate("Bottom", { screen: "쿠폰" });
     }
     navigation.navigate("LoginIntro");
