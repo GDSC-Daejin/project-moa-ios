@@ -16,6 +16,7 @@ export type RootStackParam = {
   Home: undefined;
   LoginMain: undefined;
   LoginIntro: undefined;
+  AddCoupon: undefined;
 };
 
 export type BottomStackParams = {
@@ -25,4 +26,8 @@ export type BottomStackParams = {
 export type UserData = {
   nickname: string;
   thumbnailImageUrl: string;
+};
+
+export type AddCouponParam = {
+  AddCoupon: undefined;
 };

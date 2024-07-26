@@ -1,34 +1,24 @@
-import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import { Colors, Size } from "../style/style";
 import Svg, { Path } from "react-native-svg";
+import { Colors, Size } from "../style/style";
+import { useCategories } from "../hooks/useCategories";
+import { deleteData } from "./util/deleteUtil";
 
 type SelectCategoryProps = {
   setShowBox: (show: boolean) => void;
 };
 
 export default function SelectCategory({ setShowBox }: SelectCategoryProps) {
-  const [categories, setCategories] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState<string>("");
-
-  const handleChange = (e: any) => {
-    setInputValue(e);
-  };
-
-  const handleAdd = () => {
-    if (inputValue.length > 0 && categories.length < 1) {
-      setCategories([...categories, inputValue]);
-      setInputValue("");
-    } else {
-      Alert.alert("카테고리는 1개만 작성해주세요");
-    }
-  };
-
-  const handleCancel = () => {
-    setInputValue("");
-    setCategories([]);
-  };
+  const {
+    categories,
+    inputValue,
+    loading,
+    handleChange,
+    handleAdd,
+    setInputValue,
+  } = useCategories();
 
   return (
     <View style={styles.container}>
@@ -41,22 +31,22 @@ export default function SelectCategory({ setShowBox }: SelectCategoryProps) {
         value={inputValue}
       />
       <View style={styles.inputValue}>
-        {categories.map((category, index) => (
+        {Object.keys(categories).map((key) => (
           <View
-            key={index}
+            key={key}
             style={[
               styles.inputTextContainer,
-              { minWidth: Math.min(500, inputValue.length * 13) },
+              { minWidth: Math.min(500, key.length * 13) },
             ]}
           >
-            <Text style={styles.inputText}>{category}</Text>
-            <Pressable style={styles.closeSvg} onPress={handleCancel}>
+            <Text style={styles.inputText}>{categories[key]}</Text>
+            <Pressable style={styles.closeSvg} onPress={deleteData}>
               <Svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <Path
                   d="M1 0.5L13 12.5M1 12.5L13 0.5L1 12.5Z"
                   stroke="#949494"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </Svg>
             </Pressable>
@@ -79,6 +69,7 @@ export default function SelectCategory({ setShowBox }: SelectCategoryProps) {
           )}
         </Pressable>
       </View>
+      {loading && <Text>Loading...</Text>}
     </View>
   );
 }

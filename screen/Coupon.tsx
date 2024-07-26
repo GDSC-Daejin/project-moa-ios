@@ -4,15 +4,16 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors, Size } from "../style/style";
 import { FlatList } from "react-native-gesture-handler";
 import SelectCategory from "../components/SelectCategory";
-import { app } from "../firebaseConfig";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { AddCouponParam } from "../type/type";
 
 export default function Coupon() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [data, setData] = useState([]);
   const [showBox, setShowBox] = useState(false);
 
-  const a = app;
-  console.log(a);
+  const navigation = useNavigation<StackNavigationProp<AddCouponParam>>();
 
   const topData = [
     { id: "top_all", label: "전체" },
@@ -29,10 +30,13 @@ export default function Coupon() {
 
   const handlePress = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    if (categoryId === "bottom_plus") {
+      setShowBox(true);
+    }
   };
 
   const handleAdd = () => {
-    setShowBox(true);
+    navigation.navigate("AddCoupon");
   };
 
   const getStyleForCategory = (categoryId: string) => {
