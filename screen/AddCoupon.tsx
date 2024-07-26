@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
 import { Colors, Size } from "../style/style";
 import CategorySelector from "../components/CategorySelector";
+import { Switch } from "react-native-gesture-handler";
 
 export default function AddCoupon() {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -65,10 +66,10 @@ export default function AddCoupon() {
             <Text style={styles.plusFont}>+2</Text>
           </View>
         </ScrollView>
-        <View>
-          <Text>금액</Text>
-          <></>
-        </View>
+      </View>
+      <View style={styles.priceContainer}>
+        <Text>금액</Text>
+        <Switch />
       </View>
     </View>
   );
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 20,
     borderBottomColor: Colors.MoaGray.gray100,
-    borderBottomWidth: 4,
+    borderBottomWidth: 7,
   },
 
   scrollViewContainer: {
@@ -153,5 +154,12 @@ const styles = StyleSheet.create({
   plusFont: {
     fontSize: Size.body3Medium14,
     color: Colors.MoaGray.gray400,
+  },
+
+  priceContainer: {
+    top: 164,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
   },
 });
