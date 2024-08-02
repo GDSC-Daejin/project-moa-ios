@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import {
+  Alert,
   Image,
   Pressable,
   StyleSheet,
@@ -8,11 +8,23 @@ import {
   View,
 } from "react-native";
 import { Colors, Size } from "../style/style";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { CouponListParam } from "../type/type";
+import * as Crypto from "expo-crypto";
 
 interface ModalProps {
   downloadUrl: string | null;
   setShow: (show: boolean) => void;
   ocrData: any;
+}
+
+interface UserInfo {
+  nickname: string;
 }
 
 const extractUniqueInferTexts = (fields: any[]) => {
@@ -27,12 +39,94 @@ const extractUniqueInferTexts = (fields: any[]) => {
   return Array.from(textSet);
 };
 
+const extractCouponData = (ocrData: any, downloadUrl: string | null) => {
+  let couponData: any[] = [];
+  const newCouponId = Crypto.randomUUID();
+
+  if (ocrData && ocrData.fields) {
+    const uniqueTexts = extractUniqueInferTexts(ocrData.fields);
+    const findNumber = uniqueTexts.findIndex((text) => /^\d/.test(text));
+
+    if (findNumber !== -1) {
+      const title = uniqueTexts.slice(0, findNumber).join(" ");
+      const couponNumber = uniqueTexts.slice(findNumber, -1);
+
+      const findFilterNumber = couponNumber.filter((text: string) =>
+        /^\d+$/.test(text)
+      );
+      const period = uniqueTexts.findIndex((text) => text.includes("유효기간"));
+
+      const realPeriod = uniqueTexts.slice(period + 1, period + 3);
+
+      const category = uniqueTexts.slice(0, 1);
+
+      couponData.push({
+        couponName: title,
+        couponNumber: findFilterNumber.join(" "),
+        img: downloadUrl,
+        id: newCouponId,
+        category: category.join(""),
+        period: realPeriod.join(" "),
+      });
+    }
+  }
+
+  return couponData;
+};
+
 export default function Modal({ downloadUrl, setShow, ocrData }: ModalProps) {
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const navigation = useNavigation<StackNavigationProp<CouponListParam>>();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const userData = await AsyncStorage.getItem("user");
+      if (userData) {
+        setUserInfo(JSON.parse(userData));
+      }
+    };
+
+    getUser();
+  }, []);
+
   const handleClose = () => {
     setShow(false);
   };
 
-  const handleOpen = () => {};
+  const handleOpen = async () => {
+    const userName = userInfo?.nickname;
+
+    if (!userName) {
+      Alert.alert("사용자 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    try {
+      const userRef = doc(db, "coupons", userName);
+
+      const userDoc = await getDoc(userRef);
+      const existingData = userDoc.exists() ? userDoc.data() : { coupons: [] };
+      const newCoupons = extractCouponData(ocrData, downloadUrl);
+
+      const updatedCoupons = [...(existingData.coupons || []), ...newCoupons];
+
+      await setDoc(userRef, { coupons: updatedCoupons });
+
+      Alert.alert("성공", "곧 이동합니다", [
+        {
+          text: "확인",
+          onPress: () => {
+            const mostRecentCoupon = updatedCoupons[updatedCoupons.length - 1];
+            navigation.navigate("AddCouponConfirm", {
+              coupons: mostRecentCoupon,
+            });
+          },
+        },
+      ]);
+    } catch (e: any) {
+      Alert.alert("에러가 났습니다");
+    }
+  };
 
   let uniqueTexts = [];
   let title: any = [];

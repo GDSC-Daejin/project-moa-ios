@@ -17,6 +17,7 @@ export type RootStackParam = {
   LoginMain: undefined;
   LoginIntro: undefined;
   AddCoupon: undefined;
+  AddCouponConfirm: undefined;
 };
 
 export type BottomStackParams = {
@@ -30,4 +31,19 @@ export type UserData = {
 
 export type AddCouponParam = {
   AddCoupon: undefined;
+};
+
+export interface Coupon {
+  id: string;
+  couponName: string;
+  couponNumber: string;
+  img: string | null;
+  category: string;
+  period: string;
+}
+
+export type CouponListParam = {
+  AddCouponConfirm: {
+    coupons: Coupon;
+  };
 };
