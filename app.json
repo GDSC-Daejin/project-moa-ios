@@ -31,12 +31,16 @@
         "@react-native-kakao/core",
         {
           "nativeAppKey": "a3cc1edbf773c9ba5555e6036fc68373",
-          "android": {},
           "ios": {
             "handleKakaoOpenUrl": true
           }
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ef604f6d-c48e-4db0-b18c-27b8c6d275bf"
+      }
+    }
   }
 }
