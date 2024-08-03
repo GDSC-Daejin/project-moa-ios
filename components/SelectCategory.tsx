@@ -8,9 +8,13 @@ import { deleteData } from "./util/deleteUtil";
 
 type SelectCategoryProps = {
   setShowBox: (show: boolean) => void;
+  updateCategories: (categories: { id: string; label: string }[]) => void;
 };
 
-export default function SelectCategory({ setShowBox }: SelectCategoryProps) {
+export default function SelectCategory({
+  setShowBox,
+  updateCategories,
+}: SelectCategoryProps) {
   const {
     categories,
     inputValue,
@@ -19,6 +23,26 @@ export default function SelectCategory({ setShowBox }: SelectCategoryProps) {
     handleAdd,
     setInputValue,
   } = useCategories();
+
+  const handleAddCategory = async () => {
+    try {
+      await handleAdd();
+
+      const newCategory = { id: `id_${Date.now()}`, label: inputValue };
+
+      const currentCategories = Object.entries(categories).map(
+        ([key, value]) => ({
+          id: key,
+          label: value,
+        })
+      );
+
+      updateCategories([...currentCategories, newCategory]);
+      setInputValue("");
+    } catch (error) {
+      console.error("Error adding category:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -61,7 +85,7 @@ export default function SelectCategory({ setShowBox }: SelectCategoryProps) {
             </Text>
           )}
         </Pressable>
-        <Pressable style={styles.button} onPress={handleAdd}>
+        <Pressable style={styles.button} onPress={handleAddCategory}>
           {({ pressed }) => (
             <Text style={[styles.buttonText, pressed && styles.pressedText]}>
               확인
@@ -76,13 +100,17 @@ export default function SelectCategory({ setShowBox }: SelectCategoryProps) {
 
 const styles = StyleSheet.create({
   container: {
-    height: "20%",
-    backgroundColor: "white",
+    top: "40%",
+    height: "60%",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "white",
+    borderStartStartRadius: 10,
+    borderTopEndRadius: 10,
   },
 
   inputContainer: {
+    bottom: 40,
     width: "80%",
     borderWidth: 1,
     borderColor: Colors.MoaGray.gray300,
@@ -128,10 +156,12 @@ const styles = StyleSheet.create({
 
   inputTextContainer: {
     flexDirection: "row",
+    bottom: 40,
     borderWidth: 1,
     borderColor: Colors.MoaGray.gray300,
     borderRadius: 100,
-    padding: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
     alignItems: "center",
   },
 

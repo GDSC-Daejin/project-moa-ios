@@ -1,18 +1,29 @@
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors, Size } from "../style/style";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { CouponListParam } from "../type/type";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { CouponListParam, ListParam } from "../type/type";
 import DayLogo from "../components/logo/DayLogo";
 import AddCouponList from "../components/AddCouponList";
 import { ScrollView, Switch, TextInput } from "react-native-gesture-handler";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StackNavigationProp } from "@react-navigation/stack";
+
+interface UserInfo {
+  nickname: string;
+}
 
 export default function AddCouponConfirm() {
   const route = useRoute<RouteProp<CouponListParam, "AddCouponConfirm">>();
   const { coupons } = route.params;
   const [show, setShow] = useState(false);
   const [value, setValue] = useState("");
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  const navigation = useNavigation<StackNavigationProp<ListParam>>();
 
   const categoryList = [
     { id: "Category_starbucks", label: "스타벅스" },
@@ -24,6 +35,21 @@ export default function AddCouponConfirm() {
   const selectedCategory = categoryList.find(
     (item) => item.label === coupons.category
   );
+
+  useEffect(() => {
+    const getUser = async () => {
+      const getUserName = await AsyncStorage.getItem("user");
+
+      if (!getUserName) {
+        Alert.alert("유저가 없습니다!");
+        return;
+      } else {
+        setUserInfo(JSON.parse(getUserName));
+      }
+    };
+
+    getUser();
+  }, []);
 
   const toggleSwitch = () => {
     Alert.alert("알림", "금액을 추가하겠습니까?", [
@@ -50,7 +76,36 @@ export default function AddCouponConfirm() {
     Alert.alert("알림", "수정은 완료하셨나요?", [
       {
         text: "네",
-        onPress: () => {},
+        onPress: async () => {
+          if (value.includes("원") === false) {
+            Alert.alert("금액에 원 입력이 생략되었습니다!");
+          }
+
+          const userName = userInfo?.nickname;
+          if (!userName) {
+            Alert.alert("유저 정보가 없습니다!");
+            return;
+          }
+
+          try {
+            const docRef = doc(db, "coupons", userName);
+
+            await updateDoc(docRef, {
+              coupons: arrayUnion({
+                category: coupons.category,
+                img: coupons.img,
+                couponName: coupons.couponName,
+                period: coupons.period,
+                price: value,
+              }),
+            });
+            setTimeout(() => {
+              navigation.navigate("Bottom", { screen: "Coupon" });
+            }, 1000);
+          } catch (e: any) {
+            Alert.alert(e);
+          }
+        },
       },
       {
         text: "아니오",

@@ -137,7 +137,7 @@ export default function Modal({ downloadUrl, setShow, ocrData }: ModalProps) {
     const findNumber = uniqueTexts.findIndex((text) => /^\d/.test(text));
 
     if (findNumber !== -1) {
-      title = uniqueTexts.slice(0, findNumber);
+      title = uniqueTexts.slice(1, findNumber);
       couponNumber = uniqueTexts.slice(findNumber, -1);
     } else {
       title = uniqueTexts;

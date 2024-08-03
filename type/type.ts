@@ -47,3 +47,7 @@ export type CouponListParam = {
     coupons: Coupon;
   };
 };
+
+export type ListParam = {
+  Bottom: { screen: string } | undefined;
+};

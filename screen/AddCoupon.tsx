@@ -8,6 +8,9 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import AddCouponList from "../components/AddCouponList";
 import Modal from "../components/Modal";
 import Ocr from "../components/lib/Ocr";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { ListParam } from "../type/type";
 
 export default function AddCoupon() {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -17,6 +20,7 @@ export default function AddCoupon() {
   const [ocrData, setOcrData] = useState<any>(null);
 
   const storage = getStorage();
+  const navigation = useNavigation<StackNavigationProp<ListParam>>();
 
   const categoryList = [
     { id: "Category_all", label: "전체" },
@@ -68,6 +72,10 @@ export default function AddCoupon() {
     setOcrData(data);
   };
 
+  const handleCancel = () => {
+    navigation.navigate("Bottom", { screen: "Coupon" });
+  };
+
   return (
     <View style={styles.container}>
       {show && (
@@ -111,6 +119,7 @@ export default function AddCoupon() {
               styles.selectButton,
               pressed && styles.pressed,
             ]}
+            onPress={handleCancel}
           >
             {({ pressed }) => (
               <Text style={[styles.selectFont, pressed && styles.pressedText]}>
